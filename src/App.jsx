@@ -1,24 +1,11 @@
 import { useState } from "react";
+import confetti from "canvas-confetti";
+import Square from "./components/Square";
+import { TURNS } from "./constants";
+import { WINNER_COMBOS } from "./constants";
 import "./App.css";
 
-const TURNS = {
-  X: "x",
-  O: "o",
-};
-
 // eslint-disable-next-line react/prop-types
-const Square = ({ children, updateBoard, index, isSelected }) => {
-  const className = `square ${isSelected ? "is-selected " : ""}`;
-  const handleclick = () => {
-    updateBoard(index);
-  };
-  return (
-    <div onClick={handleclick} className={className}>
-      {children}
-    </div>
-  );
-};
-
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
 
@@ -26,16 +13,6 @@ function App() {
 
   // eslint-disable-next-line no-unused-vars
   const [winner, setWinner] = useState(null);
-
-  const WINNER_COMBOS = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
 
   const checkWinner = (boardToCheck) => {
     for (const combo of WINNER_COMBOS) {
@@ -51,6 +28,17 @@ function App() {
     return null;
   };
 
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setWinner(null);
+    setTurn(TURNS.O);
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  const checkEndGame = (newboard) => {
+    return newboard.every((square) => square !== null);
+  };
+
   const updateBoard = (index) => {
     if (board[index] || winner) return;
 
@@ -62,16 +50,16 @@ function App() {
     setTurn(newTurn);
     const newWinner = checkWinner(newBoard);
     if (newWinner) {
-      setWinner((prevWinner) => {
-        console.log("winner is : ", newWinner);
-        console.log("old winner is :", prevWinner);
-        return newWinner;
-      });
+      setWinner(newWinner);
+      confetti();
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false);
     }
   };
 
   return (
     <main className="board">
+      <button onClick={resetGame}>Empezar de nuevo</button>
       <h1>Tic Tac Toe</h1>
       <section className="game">
         {board.map((_, index) => {
@@ -98,7 +86,7 @@ function App() {
           <header className="win">{winner && <Square>{winner}</Square>}</header>
 
           <footer>
-            <button>Empezar de nuevo</button>
+            <button onClick={resetGame}>Empezar de nuevo</button>
           </footer>
         </section>
       )}
