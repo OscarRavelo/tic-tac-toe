@@ -1,3 +1,4 @@
+// eslint-disable-next-line react/prop-types
 const Square = ({ children, updateBoard, index, isSelected }) => {
   const className = `square ${isSelected ? "is-selected " : ""}`;
   const handleclick = () => {

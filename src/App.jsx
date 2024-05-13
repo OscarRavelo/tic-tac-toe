@@ -2,8 +2,9 @@ import { useState } from "react";
 import confetti from "canvas-confetti";
 import Square from "./components/Square";
 import { TURNS } from "./constants";
-import { WINNER_COMBOS } from "./constants";
+import { checkWinner } from "./logic/board";
 import "./App.css";
+import { WinnerModal } from "./components/WinnerModal";
 
 // eslint-disable-next-line react/prop-types
 function App() {
@@ -13,20 +14,6 @@ function App() {
 
   // eslint-disable-next-line no-unused-vars
   const [winner, setWinner] = useState(null);
-
-  const checkWinner = (boardToCheck) => {
-    for (const combo of WINNER_COMBOS) {
-      const [a, b, c] = combo;
-      if (
-        boardToCheck[a] &&
-        boardToCheck[a] === boardToCheck[b] &&
-        boardToCheck[a] === boardToCheck[c]
-      ) {
-        return boardToCheck[a];
-      }
-    }
-    return null;
-  };
 
   const resetGame = () => {
     setBoard(Array(9).fill(null));
@@ -72,24 +59,11 @@ function App() {
       </section>
 
       <section className="turn">
-        <p>
-          <Square isSelected={turn === TURNS.X}> {TURNS.X}</Square>
-          <Square isSelected={turn === TURNS.O}> {TURNS.O}</Square>
-        </p>
+        <Square isSelected={turn === TURNS.X}> {TURNS.X}</Square>
+        <Square isSelected={turn === TURNS.O}> {TURNS.O}</Square>
       </section>
-      {winner !== null && (
-        <section className="winner">
-          <div className="text">
-            <h2>{winner === false ? "drawn" : "The winner is "}</h2>
-          </div>
-
-          <header className="win">{winner && <Square>{winner}</Square>}</header>
-
-          <footer>
-            <button onClick={resetGame}>Empezar de nuevo</button>
-          </footer>
-        </section>
-      )}
+      {console.log(winner)}
+      {winner !== null && <WinnerModal onClick={resetGame} winner turn />}
     </main>
   );
 }
