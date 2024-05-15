@@ -8,14 +8,24 @@ import { WinnerModal } from "./components/WinnerModal";
 
 // eslint-disable-next-line react/prop-types
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null));
+  // retrieve the localStorage
+  const [board, setBoard] = useState(() => {
+    const boardFromStorage = window.localStorage.getItem("board");
+    if (boardFromStorage) return JSON.parse(boardFromStorage);
+    return Array(9).fill(null);
+  });
 
   const [turn, setTurn] = useState(TURNS.X);
 
   // eslint-disable-next-line no-unused-vars
-  const [winner, setWinner] = useState(null);
+  const [winner, setWinner] = useState(() => {
+    const winnerFromStorage = window.localStorage.getItem("turn");
+    if (winnerFromStorage) return turn;
+    return null;
+  });
 
   const resetGame = () => {
+    console.log("working");
     setBoard(Array(9).fill(null));
     setWinner(null);
     setTurn(TURNS.O);
@@ -35,6 +45,10 @@ function App() {
 
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
     setTurn(newTurn);
+    // saving in local store
+    window.localStorage.setItem("board", JSON.stringify(newBoard));
+    window.localStorage.setItem("turn", turn);
+
     const newWinner = checkWinner(newBoard);
     if (newWinner) {
       setWinner(newWinner);
@@ -63,7 +77,9 @@ function App() {
         <Square isSelected={turn === TURNS.O}> {TURNS.O}</Square>
       </section>
       {console.log(winner)}
-      {winner !== null && <WinnerModal onClick={resetGame} winner turn />}
+      {winner !== null && (
+        <WinnerModal handleOnclick={resetGame} winner={winner} />
+      )}
     </main>
   );
 }
